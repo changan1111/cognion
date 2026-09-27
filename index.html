@@ -475,13 +475,34 @@ footer{background:var(--panel);padding:56px 32px 30px}
 <div class="page" id="page-contact">
   <div class="herobg"><section class="hero"><h1>Let's build what comes next.</h1>
     <p class="sub">Technology transformation begins with understanding the problem. Whether you are modernising an enterprise, developing intelligent infrastructure, evaluating AI, entering a new market or assembling a specialist technology ecosystem, Cognion Global is ready to start the conversation.</p>
-    <form class="formrow" action="mailto:sri@cognionglobal.com" method="POST" enctype="text/plain">
-      <label>Name</label><input type="text" name="Name" required><label>Organization</label><input type="text" name="Organization">
-      <label>Email</label><input type="email" name="Email" required><label>Country</label><input type="text" name="Country">
-      <label>What are you working on?</label><textarea name="Message"></textarea>
-      <button class="btn-primary" type="submit" style="width:fit-content;margin-top:6px">Send</button>
-      <p class="note" style="margin-top:6px">Clicking Send opens your email app with this pre-filled &mdash; just hit send there.</p>
-    </form>
+    <form class="formrow" id="contactForm">
+  <input type="hidden" name="access_key" value="68d87355-2174-4f1c-b1f7-ce3825f620a9">
+  <input type="hidden" name="subject" value="New enquiry from Cognion Global website">
+  <input type="hidden" name="from_name" value="Cognion Global Website">
+  <input type="checkbox" name="botcheck" style="display:none">
+
+  <label>Name</label><input type="text" name="Name" required>
+  <label>Organization</label><input type="text" name="Organization">
+  <label>Email</label><input type="email" name="Email" required>
+  <label>Country</label><input type="text" name="Country">
+  <label>What are you working on?</label><textarea name="Message"></textarea>
+
+  <label style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--ink-dim);margin-top:4px">
+    <input type="checkbox" name="consent" required style="margin-top:3px;width:auto">
+    <span>I agree that the information I submit will be used by Cognion Global Technologies to respond to my enquiry, in accordance with the Privacy Statement below.</span>
+  </label>
+
+  <button class="btn-primary" type="submit" style="width:fit-content;margin-top:6px" id="contactSubmitBtn">Send</button>
+  <p class="note" id="contactFormStatus" style="margin-top:6px"></p>
+</form>
+<p class="note" style="margin-top:24px">Cognion Global Technologies &nbsp;·&nbsp; India | Oman | GCC | Global<br>Business enquiries: <a href="mailto:sri@cognionglobal.com" style="text-decoration:underline">sri@cognionglobal.com</a> &nbsp;·&nbsp; Website: www.cognionglobal.com</p>
+
+<div style="margin-top:44px;padding-top:24px;border-top:1px solid var(--line);max-width:640px">
+  <h3 style="font-size:15px">Privacy Statement</h3>
+  <p style="font-size:12.5px;color:var(--ink-dim);margin-top:10px;line-height:1.7">
+    Cognion Global Technologies ("we", "us") collects the personal information you submit through this form — including your name, organisation, email address, country and message — solely to respond to your enquiry and to communicate with you about the products, services or opportunities you have asked about. We do not sell or rent your information to third parties. We may share it with our internal team, affiliates or delivery partners strictly on a need-to-know basis to progress your enquiry. Your information is retained only as long as necessary for these purposes, or as required by law, and is stored using reasonable technical and organisational safeguards. You may ask us to access, correct or delete your information at any time by writing to <a href="mailto:sri@cognionglobal.com" style="text-decoration:underline">sri@cognionglobal.com</a>. By submitting this form, you consent to this collection and use of your information as described here.
+  </p>
+</div>
     <p class="note">Cognion Global Technologies &nbsp;·&nbsp; India | Oman | GCC | Global<br>Business enquiries: <a href="mailto:sri@cognionglobal.com" style="text-decoration:underline">sri@cognionglobal.com</a> &nbsp;·&nbsp; Website: www.cognionglobal.com</p>
   </section></div>
 </div>
@@ -513,6 +534,46 @@ function rail(d){var r=document.getElementById('rail');r.scrollBy({left:d*380,be
 document.querySelectorAll('.stat b[data-n]').forEach(function(b){var n=+b.dataset.n,t=0;b.textContent='0';
 var iv=setInterval(function(){t++;b.textContent=Math.min(n,t);if(t>=n)clearInterval(iv)},260)})})();
 </script>
+<script>
+document.getElementById('contactForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var form = e.target;
+  var btn = document.getElementById('contactSubmitBtn');
+  var status = document.getElementById('contactFormStatus');
+  var original = btn.textContent;
 
+  var data = new FormData(form);
+  data.set('replyto', form.Email.value);
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  status.textContent = '';
+
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json' },
+    body: data
+  })
+    .then(function(res){ return res.json(); })
+    .then(function(json){
+      if (json.success) {
+        status.style.color = 'var(--teal)';
+        status.textContent = 'Thank you — your message has been sent. We will be in touch shortly.';
+        form.reset();
+      } else {
+        status.style.color = '#c0392b';
+        status.textContent = 'Something went wrong. Please try again or email sri@cognionglobal.com directly.';
+      }
+    })
+    .catch(function(){
+      status.style.color = '#c0392b';
+      status.textContent = 'Something went wrong. Please try again or email sri@cognionglobal.com directly.';
+    })
+    .finally(function(){
+      btn.disabled = false;
+      btn.textContent = original;
+    });
+});
+</script>
 </body>
 </html>
